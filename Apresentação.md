@@ -4,7 +4,7 @@ Aluno: Matheus Henrique Silva de Melo T01
 
 Video : [https://youtu.be/65AXh3DYbYA](https://youtu.be/65AXh3DYbYA)
 
-Este documento descreve a solução para o **problema de detecção e contagem** de células, utilizando um pipeline estruturado em **múltiplas etapas** de processamento digital de imagens.
+Este documento descreve a solução para o **problema de detecção e contagem** de células por seus núcleos, utilizando um pipeline estruturado em **múltiplas etapas** de processamento digital de imagens.
 
 ## **1. O Desafio da Detecção e Contagem**
 
