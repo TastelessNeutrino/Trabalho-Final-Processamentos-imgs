@@ -1,43 +1,43 @@
-# **Apresentação : Problema de Detecção de Neurônios**
+# **Trabalho Final: Detecção e Contagem de Núcleos Celulares**
 
-Aluno: Matheus Henrique Silva de Melo T01
+**Aluno**: Matheus Henrique Silva de Melo T01
 
-Video : [https://youtu.be/65AXh3DYbYA](https://youtu.be/65AXh3DYbYA)
+**Vídeo** : [https://youtu.be/65AXh3DYbYA](https://youtu.be/65AXh3DYbYA)
 
-Este documento descreve a solução para o **problema de detecção e contagem** de células por seus núcleos, utilizando um pipeline estruturado em **múltiplas etapas** de processamento digital de imagens.
+**Disciplina:** Processamento Digital de Imagens
 
-## **1. O Desafio da Detecção e Contagem**
+**Metodologia:** Visão Computacional Clássica (Transformada de Hough Circular)
 
-O objetivo central deste trabalho é resolver o problema de detecção e contagem de neurônios em imagens de microscopia. O primeiro grande aprendizado foi entender que, neste cenário, o **Thresholding (limiarização)** é um inimigo da precisão. As células raramente estão isoladas; elas aparecem coladas ou sobrepostas. Se eu tentasse apenas binarizar a imagem, o resultado seria um "amontoado" de pixels onde três ou quatro neurônios virariam uma única mancha. A solução exigiu uma abordagem geométrica dividida em etapas sequenciais.
+## **1\. Introdução e Objetivo do Projeto**
 
-## **2. Processamento em Múltiplas Etapas: Especialização de Camadas**
+Este projeto apresenta uma solução automatizada para o problema de detecção e quantificação de núcleos de neurônios em imagens de microscopia. O foco central desta pesquisa é superar as limitações críticas da segmentação baseada puramente em pixels, como a limiarização simples, que costuma falhar em cenários de Bioimagem de alta complexidade. Entre os principais desafios abordados estão o baixo contraste, onde o fundo ruidoso se confunde com as células, e o desafio dos aglomerados, em que núcleos encostados são erroneamente fundidos em um único objeto por métodos tradicionais. Ao contrário das soluções de Deep Learning, frequentemente tratadas como "caixas pretas", esta abordagem prioriza a transparência matemática e o controle total sobre os parâmetros geométricos.
 
-Para aumentar a acurácia da detecção, tratei a imagem original através de diferentes estágios de filtragem, criando duas versões especializadas:
+## **2\. Metodologia: A Arquitetura de Múltiplas Etapas**
 
-* **Etapa de Contorno (Corpo):** Utilização do **Filtro Gaussiano**. Ele funciona como um "borrador" inteligente que remove a textura granulada de dentro da célula e foca no que importa: a borda circular.
-* **Etapa de Núcleo (Glow):** Utilização do **White Top-Hat**. Este estágio é fundamental para extrair apenas o que é pequeno e muito brilhante, ignorando as variações lentas de luz e ruídos de fundo.
+Para garantir uma acurácia elevada, o sistema não tenta localizar a célula em uma única operação. Em vez disso, utiliza uma estratégia de dupla detecção baseada na morfologia concêntrica do neurônio, dividindo o processamento em duas camadas especializadas que extraem características distintas da imagem original.
 
-## **3. Validação: A "Autenticação de Dois Fatores"**
+A primeira camada foca no Brilho Central, também chamado de *Glow*, que corresponde ao centro de alta intensidade luminosa do núcleo. Para isolar essa característica, aplico o filtro *White Top-Hat*, que é eficiente na extração de pontos de luz pequenos e intensos enquanto ignora as variações lentas de iluminação do fundo. Após esse realce, o detector de bordas Canny é configurado com limiares elevados para capturar apenas a transição abrupta de brilho que define o coração da célula.
 
-Talvez o maior aprendizado técnico tenha sido a percepção de que cada etapa de detecção isolada gera um tipo específico de falso positivo:
+A segunda camada foca no Corpo Celular, ou anel, que representa a silhueta cinza envolvendo o núcleo. Nesta etapa, utilizo a suavização Gaussiana para remover as texturas granuladas internas e transformar o corpo em uma forma visualmente suave e contínua. Em seguida, um segundo detector Canny, desta vez com limiares baixos, é aplicado para capturar os contornos externos mais sutis da membrana celular, garantindo que a estrutura periférica da célula seja devidamente delineada.
 
-* O **Canny** (detector de bordas) é excelente, mas se perde nos **axônios**, tentando desenhar círculos onde só existem linhas.
-* O brilho central sofre com a **poluição luminosa**, criando detecções em borrões de luz fora de foco.
+## **3\. Calibração e Parâmetros Técnicos**
 
-A solução foi implementar uma etapa de **autenticação cruzada**. Ao cruzar a coordenada de um círculo de "corpo" com um de "brilho" usando a **Distância Euclidiana**, consegui filtrar quase 100% do ruído. Se o brilho e o anel não ocupam o mesmo espaço, o sistema não contabiliza o objeto.
+A eficácia deste sistema depende de uma calibração fina de parâmetros que controlam a sensibilidade de cada etapa. O parâmetro **Sigma**, aplicado na suavização Gaussiana inicial, é ajustado para equilibrar a remoção de ruído e a preservação do formato circular; um valor muito baixo manteria granulações que enganam o Hough, enquanto um valor muito alto poderia deformar as bordas do corpo celular. No detector de bordas Canny, os **limiares (thresholds)** são diferenciados: na camada de brilho, utilizo valores altos para ignorar borrões de luz fraca, enquanto na camada de corpo, utilizo valores mais baixos para permitir que contornos de menor contraste sejam rastreados.
 
-## **4. Implementação do Acumulador de Hough**
+Na etapa da Transformada de Hough, o parâmetro de **Acumulador Mínimo** (ou votos) define quantos pixels da borda devem "concordar" com a existência de um círculo. Este valor foi ajustado para cerca de 45% da circunferência, o que confere robustez para detectar núcleos que estejam parcialmente obstruídos ou com bordas falhas. Outro ponto crítico é a **Distância Mínima** configurada no algoritmo de Hough, que impede que o sistema detecte múltiplos círculos dentro da mesma célula ou ao longo de um axônio, forçando o algoritmo a escolher apenas o centro mais provável em cada região.
 
-A construção manual da Transformada de Hough (reaproveitada da atividade 4) permitiu um controle fino sobre o acumulador em múltiplas escalas:
+## **4\. Implementação da Transformada de Hough Circular (CHT)**
 
-* Restrição de raio entre **6 e 13 pixels** para eliminar estruturas irrelevantes.
-* Ajuste da distância mínima entre círculos para evitar que um axônio fosse lido como uma "fila" de células.
+A Transformada de Hough foi implementada manualmente para permitir um controle rigoroso sobre o acumulador, garantindo que a detecção fosse fiel à realidade biológica dos neurônios. O sistema foi calibrado para buscar raios exclusivamente entre 6 e 13 pixels, o que permite filtrar automaticamente qualquer estrutura que não se encaixe no perfil esperado das células estudadas. Para lidar com a sobreposição de votos, desenvolvi uma função customizada de limpeza de picos que utiliza um método iterativo. Esse processo analisa as regiões de alta densidade no acumulador e mantém apenas o voto mais forte para cada célula, eliminando círculos redundantes ou deslocados. O uso de limiares absolutos de votação garante que artefatos brilhantes, mas sem forma circular consistente, não mascarem os núcleos reais.
 
-## **5. Etapa Final: Limpeza e Seleção do Melhor Voto**
+## **5\. Validação por "Autenticação de Dois Fatores"**
 
-Para resolver a sobreposição de detecções (vários círculos para o mesmo núcleo), apliquei uma etapa de **limpeza de duplicatas**. Em vez de aceitar todos os votos do acumulador, o código analisa a região e mantém apenas o **voto mais forte** (o pico do acumulador). Isso transformou um diagnóstico poluído em uma contagem final limpa e única por neurônio.
+O principal diferencial técnico desta solução reside no cruzamento inteligente de dados entre as camadas detectadas, funcionando como uma autenticação de dois fatores. Cada etapa de detecção isolada possui falhas intrínsecas: a camada de corpo celular tende a detectar axônios como ruído estrutural, enquanto a camada de brilho é frequentemente enganada pela poluição luminosa de células fora de foco.
 
-## **6. Conclusão e Resultados**
+A regra de validação estabelece que um núcleo só é autenticado e contabilizado se houver uma coincidência geométrica precisa, onde um centro de brilho deve existir obrigatoriamente dentro do raio de um anel de corpo celular. Essa verificação é realizada através do cálculo da **distância euclidiana** entre os centros detectados em ambas as camadas. O parâmetro de tolerância para essa distância foi fixado em aproximadamente 8 pixels, garantindo que mesmo pequenos desalinhamentos naturais na captura da imagem não impeçam a autenticação, mas descartando sumariamente objetos que não apresentem essa sobreposição central, como ruídos ópticos ou estruturais.
 
-O teste em um dataset variado provou que a robustez do sistema não vem de um único filtro, mas da eficácia da **combinação de múltiplas etapas**. O sistema focado no "brilho autenticado pelo anel" mostrou-se muito mais confiável para a contagem final do que qualquer método de etapa única ou segmentação direta por pixels.
+## **6\. Conclusão e Resultados**
 
+O algoritmo demonstrou ser uma alternativa robusta, estável e extremamente leve se comparada aos modelos de Deep Learning usados originalmente no desafio Roboflow. A principal vantagem reside na eficiência computacional, permitindo que o processamento ocorra em frações de segundo sem a necessidade de hardware especializado como GPUs. Além disso, a precisão geométrica obtida através da análise dos picos do acumulador de Hough provou ser superior à binarização por pixels para separar células encostadas. O sistema de autenticação cruzada garante que apenas estruturas que possuem simultaneamente corpo e brilho central sejam validadas, mantendo o desempenho do algoritmo consistente mesmo em datasets com alta variabilidade ruidosa.
+
+**Desenvolvido como projeto final de Processamento Digital de Imagens.**
