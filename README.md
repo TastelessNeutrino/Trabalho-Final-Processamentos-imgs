@@ -28,9 +28,5 @@ Regra de Validação: Um núcleo só é confirmado se um centro de "Glow" for de
 Esta validação cruzada elimina:
 Detritos brilhantes: Que possuem brilho mas não têm o corpo celular cinza ao redor.
 Sombras/Ruído de fundo: Que possuem forma circular mas não apresentam o "vital" brilho central.
-5. Automação e Robustez
-O projeto inclui ferramentas de manipulação de arquivos para garantir a escalabilidade:
-Organização via Regex: Script que identifica arquivos .jpg e renomeia-os para o padrão neuron(n).jpg, preservando os nomes corretos e preenchendo lacunas de numeração automaticamente.
-Teste Aleatório (Batch Testing): Implementação de um loop que seleciona 5 imagens aleatórias (via random.sample) do diretório e aplica o pipeline completo, provando a acurácia do algoritmo em diferentes condições de iluminação e densidade celular.
-6. Conclusão
+5. Conclusão
 O algoritmo demonstrou ser uma alternativa robusta e leve ao Deep Learning. Ao utilizar a geometria como critério de decisão, o sistema consegue separar células encostadas, cumprindo os requisitos acadêmicos de Processamento Digital de Imagens com alta eficácia e transparência matemática.
