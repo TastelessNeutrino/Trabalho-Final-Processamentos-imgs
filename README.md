@@ -29,4 +29,4 @@ Esta validação cruzada elimina:
 Detritos brilhantes: Que possuem brilho mas não têm o corpo celular cinza ao redor.
 Sombras/Ruído de fundo: Que possuem forma circular mas não apresentam o "vital" brilho central.
 5. Conclusão
-O algoritmo demonstrou ser uma alternativa robusta e leve ao Deep Learning. Ao utilizar a geometria como critério de decisão, o sistema consegue separar células encostadas, cumprindo os requisitos acadêmicos de Processamento Digital de Imagens com alta eficácia e transparência matemática.
+O algoritmo demonstrou ser uma alternativa robusta e leve ao Deep Learning usado na versão original do desafio roboflow. Ao utilizar a geometria como critério de decisão, o sistema consegue separar células encostadas, cumprindo os requisitos acadêmicos de Processamento Digital de Imagens com alta eficácia e transparência matemática.
