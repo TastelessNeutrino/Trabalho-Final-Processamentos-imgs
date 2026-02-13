@@ -20,7 +20,7 @@ Detecção: Filtro Canny com limiar baixo para capturar contornos suaves da memb
 3. Implementação da Transformada de Hough Circular (CHT)
 A Transformada de Hough é utilizada para inferir a geometria circular mesmo em perímetros incompletos ou ruidosos.
 Busca de Raios: O sistema foi calibrado para um range nuclear típico observado no dataset, entre 6 e 13 pixels.
-Votação e Picos: O acumulador de Hough é processado por uma função customizada de detecção de picos que aplica Non-Maximum Suppression (NMS), garantindo que cada núcleo seja contado apenas uma vez e eliminando redundâncias.
+Votação e Picos: O acumulador de Hough é processado por uma função customizada de detecção de picos que aplica um método de limpeza por iteração, garantindo que cada núcleo seja contado apenas uma vez e eliminando redundâncias.
 Limiar de Voto: Definido de forma absoluta para garantir estabilidade, independente de artefatos extremamente brilhantes na imagem que pudessem mascarar os núcleos reais.
 4. Validação por Coincidência Geométrica
 A decisão final da contagem não depende apenas da forma ou apenas da intensidade, mas da intersecção espacial de ambas as camadas detectadas:
